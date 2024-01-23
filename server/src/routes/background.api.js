@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const backgroundControl = require('../controller/background.controller');
 
 router.post('/create', backgroundControl.createBackground);

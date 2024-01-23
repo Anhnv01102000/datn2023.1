@@ -1,10 +1,10 @@
 import axios from "axios";
 import { AppDispatch } from ".."
-import UserService, { deleteUser, getUser, updateUserRole } from "../../services/user.service";
+import { deleteUser, getUser, updateUserRole, validateAuthToken } from "../../services/user.service";
 
 const validateAuth = (token: string) => async (dispatch: AppDispatch) => {
     try {
-        const validate = await UserService.validateAuthToken({ token });
+        const validate: any = await validateAuthToken({ token });
 
         if (validate.data) {
             dispatch({

@@ -28,7 +28,7 @@ const ManageUserComponent = () => {
     const role = [
         {
             id: 1,
-            name: "Admin"
+            name: "Supporter"
         },
         {
             id: 2,
@@ -64,10 +64,10 @@ const ManageUserComponent = () => {
             width: 200,
             render: role => {
                 let color = "geekblue"
-                if (role === "Admin") {
+                if (role === "Supporter") {
                     color = "green"
                 }
-                if (role === "Owner") {
+                if (role === "Admin") {
                     color = "volcano"
                 }
                 return (

@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef, RefObject, MutableRefObject } from 
 import BaseSidebar from './BaseSidebarDesign';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faList, faImage, faFont, faPencil, faCopy, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faList, faImage, faFont, faPencil, faCopy, faTrash, faUpload, faBold, faUnderline, faItalic, faAlignLeft, faAlignCenter, faAlignRight, faAlignJustify } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fabric } from 'fabric';
 import WebFontConfig, { AvailableFontFamilies } from '../../contant/WebFontConfig';
 import WebFont from 'webfontloader';
 import { useSelector, useDispatch } from 'react-redux';
 import { createImageAsset, getAllImageAsset } from '../../services/imageAssets.service';
-import store from '../../store';
 import { uploadImageByS3 } from '../../store/actions/imageAction';
 import HeaderDesign from './HeaderDesign';
 import brushStroke1 from "../../assets/brushStroke1.svg"
@@ -42,8 +41,6 @@ const Card: React.FC = () => {
     const email = userInfo.email
 
     // console.log("cardInfo: ", cardInfo);
-
-
     const canvasRef: any = useRef(null);
     const [dispatchCompleted, setDispatchCompleted] = useState(false);
 
@@ -77,7 +74,6 @@ const Card: React.FC = () => {
         bgColor: '',
         fontFamily: 'Roboto',
         fontSize: '40',
-        textDecoration: '',
         textAlign: '',
         underline: false,
         fontWeight: '',
@@ -118,7 +114,6 @@ const Card: React.FC = () => {
                 handleEvents();
                 setIsCanvasInitialized(true);
             });
-
             setContentOption(backgrounds);
             setFontFamilyOptions(AvailableFontFamilies);
             WebFont.load(WebFontConfig);
@@ -154,14 +149,10 @@ const Card: React.FC = () => {
             backgroundColor: 'white',
             selection: false,
         })
-
-        // Kiểm tra xem cardEdit có giá trị hay không trước khi tải lên canvas
+        // Kiểm tra xem cardEdit có giá trị hay không
         if (cardEdit !== "") {
+            // Tải dữ liệu JSON từ cardEdit lên đối tượng canvas đã được khởi tạo trước đó
             canvas.loadFromJSON(cardEdit, () => {
-                // Lấy đối tượng 
-                const obj: any = canvas.item(0);
-                // Đặt đối tượng vào giữa canvas
-                canvas.centerObject(obj);
                 canvas.renderAll();
             });
         }
@@ -170,8 +161,8 @@ const Card: React.FC = () => {
     };
 
     const onMoveOption = async (idx: number, name: string, canvas: any) => {
-        const updatedOptionCard = optionCard.map((value, i) => {
-            return { ...value, active: i === idx };
+        const updatedOptionCard = optionCard.map((el, i) => {
+            return { ...el, active: i === idx };
         });
         setOptionCard(updatedOptionCard);
         setTitleOption(name);
@@ -202,10 +193,6 @@ const Card: React.FC = () => {
         }
     };
 
-    const uploadImage = (fileInput: any) => {
-        return store.dispatch(uploadImageByS3(fileInput));
-    }
-
     const uploadImageAsset = async (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         const file = fileImageAsset.current;
@@ -213,7 +200,7 @@ const Card: React.FC = () => {
 
         if (file) {
             try {
-                const upload = await uploadImage(file);
+                const upload = await dispatch(uploadImageByS3(file) as any)
                 console.log('upload is: ', upload);
                 const imageUrl = upload.data.data.Location;
 
@@ -224,7 +211,6 @@ const Card: React.FC = () => {
                     imageUrl: imageUrl,
                     filename: userInfo.username,
                 });
-
 
                 console.log(email);
                 const imageAsset = await getAllImageAsset({ email: email, });
@@ -270,12 +256,6 @@ const Card: React.FC = () => {
         text.editable = true;
         canvasRef.current.add(text)
     }
-
-    const changeTextCard = (field: string, selectedValue: string) => {
-        console.log(`Da vao changed text card for ${field}`);
-        const updatedTextCard = { ...textCard, [field]: selectedValue };
-        setTextCard(updatedTextCard);
-    };
 
     const changeTextStyle = (style: string) => {
         switch (style) {
@@ -366,14 +346,12 @@ const Card: React.FC = () => {
         console.log(activeObject);
         if (activeObject && activeObject.type === 'text') {
             // Cho phép chỉnh sửa nội dung trực tiếp
-            activeObject.set({ editable: true, editing: true });
-
+            // activeObject.set({ editable: true, editing: true });
             setIsBoxEditText(true);
             setTextCard({
                 textColor: activeObject.fill,
                 bgColor: activeObject.backgroundColor,
                 fontSize: activeObject.fontSize,
-                textDecoration: '', // Thêm thuộc tính này hoặc thiết lập giá trị phù hợp
                 textAlign: activeObject.textAlign,
                 underline: activeObject.underline,
                 fontWeight: activeObject.fontWeight,
@@ -383,8 +361,6 @@ const Card: React.FC = () => {
         } else {
             setIsBoxEditText(false);
         }
-        console.log("textCard: ", textCard);
-
         // console.log('canvas value:', activeObject);
     };
 
@@ -455,10 +431,12 @@ const Card: React.FC = () => {
         });
     };
 
-    const onClickImageBackground = async (image: any) => {
+    const onClickImageBackground = async (background: any) => {
         const imageRemote = await getRemoteImage({
-            url: image.image,
+            url: background.image,
         });
+        console.log("background: ", background);
+
         // console.log('Clicked Upload image:', imageRemote.data);
         canvasRef.current.clear();
         fabric.Image.fromURL(
@@ -563,9 +541,21 @@ const Card: React.FC = () => {
         dispatch(resetCardEdit() as any)
         dispatch(resetCardInfo() as any)
         dispatch(getListCard() as any)
-        canvasRef.current.clear()
         navigate("/")
     }
+
+    // Sự kiện popstate có thể không được kích hoạt khi sử dụng React Router
+    // Nên không thể truyền handBack trực tiếp
+
+    useEffect(() => {
+        const back = () => {
+            handleBack()
+        }
+        window.addEventListener('popstate', back);
+        return () => {
+            window.removeEventListener('popstate', () => back);
+        };
+    }, []);
 
     return (
         <div className="card">
@@ -617,8 +607,11 @@ const Card: React.FC = () => {
                                         <div className="btn-toolbar flex flex-wrap items-center">
                                             <select
                                                 className="mr-3 w-[115px] h-10 bg-white border border-gray-400 rounded outline-none cursor-pointer"
-                                                defaultValue={textCard.fontFamily}
-                                                onChange={(e) => changeTextCard('fontFamily', e.target.value)}
+                                                value={textCard.fontFamily}
+                                                onChange={(e) => setTextCard((prevTextCard) => ({
+                                                    ...prevTextCard,
+                                                    fontFamily: e.target.value
+                                                }))}
                                             >
                                                 {fontFamilyOptions.map((fontFamily: any, idx) => (
                                                     <option key={idx} style={{ fontFamily }}>
@@ -630,22 +623,31 @@ const Card: React.FC = () => {
                                                 <span>Color</span>
                                                 <input
                                                     type="color"
-                                                    defaultValue={textCard.textColor}
-                                                    onChange={(e) => changeTextCard('textColor', e.target.value)}
+                                                    value={textCard.textColor}
+                                                    onChange={(e) => setTextCard((prevTextCard) => ({
+                                                        ...prevTextCard,
+                                                        textColor: e.target.value
+                                                    }))}
                                                 />
                                             </div>
                                             <div className="me-3 h-10 color bg-white border border-gray-400 rounded outline-none cursor-pointer flex items-center gap-2 px-2">
                                                 <span>Background</span>
                                                 <input
                                                     type="color"
-                                                    defaultValue={textCard.bgColor}
-                                                    onChange={(e) => changeTextCard('bgColor', e.target.value)}
+                                                    value={textCard.bgColor}
+                                                    onChange={(e) => setTextCard((prevTextCard) => ({
+                                                        ...prevTextCard,
+                                                        bgColor: e.target.value
+                                                    }))}
                                                 />
                                             </div>
                                             <select
                                                 className="mr-3 h-10 bg-white border border-gray-400 rounded outline-none cursor-pointer"
-                                                defaultValue={textCard.fontSize}
-                                                onChange={(e) => changeTextCard('fontSize', e.target.value)}
+                                                value={textCard.fontSize}
+                                                onChange={(e) => setTextCard((prevTextCard) => ({
+                                                    ...prevTextCard,
+                                                    fontSize: e.target.value
+                                                }))}
                                             >
                                                 <option value="20">Extra small</option>
                                                 <option value="35">Small</option>
@@ -660,19 +662,19 @@ const Card: React.FC = () => {
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('bold')}
                                                 >
-                                                    <span className="fa-solid fa-bold" />
+                                                    <FontAwesomeIcon icon={faBold} />
                                                 </button>
                                                 <div
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('underline')}
                                                 >
-                                                    <span className="fa-solid fa-underline" />
+                                                    <FontAwesomeIcon icon={faUnderline} />
                                                 </div>
                                                 <button
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('italic')}
                                                 >
-                                                    <span className="fa-solid fa-italic" />
+                                                    <FontAwesomeIcon icon={faItalic} />
                                                 </button>
                                             </div>
                                             <div className="flex mr-3">
@@ -680,25 +682,26 @@ const Card: React.FC = () => {
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('align-left')}
                                                 >
-                                                    <span className="fa-solid fa-align-left" />
+                                                    <FontAwesomeIcon icon={faAlignLeft} />
+
                                                 </button>
                                                 <button
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('align-right')}
                                                 >
-                                                    <span className="fa-solid fa-align-right" />
+                                                    <FontAwesomeIcon icon={faAlignRight} />
                                                 </button>
                                                 <button
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('align-center')}
                                                 >
-                                                    <span className="fa-solid fa-align-center" />
+                                                    <FontAwesomeIcon icon={faAlignCenter} />
                                                 </button>
                                                 <button
                                                     className="bg-white border border-gray-400 rounded cursor-pointer w-10 h-10 flex items-center justify-center text-xl p-[10px]"
                                                     onClick={() => changeTextStyle('align-justify')}
                                                 >
-                                                    <span className="fa-solid fa-align-justify" />
+                                                    <FontAwesomeIcon icon={faAlignJustify} />
                                                 </button>
                                             </div>
                                         </div>

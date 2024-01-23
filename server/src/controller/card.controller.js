@@ -19,7 +19,9 @@ const createCard = async (req, res) => {
 
 const updateCard = async (req, res) => {
     const CardId = req.params.id
-    const updateCard = await Card.findByIdAndUpdate(CardId, req.body, { new: true }).populate('owner', 'username email image');
+    const updateCard = await Card.findByIdAndUpdate(
+        CardId, req.body, { new: true })
+        .populate('owner', 'username email image');
     console.log(CardId);
     if (!updateCard) {
         return res.status(404).json({
@@ -61,7 +63,7 @@ const getCardByUser = async (req, res) => {
 
 const getAllCard = async (req, res) => {
     const cards = await Card.find({ role: 'Public' }).populate('owner', 'username email image');
-    console.log(cards);
+    // console.log(cards);
     res.status(200).json({
         status: 'success',
         data: cards,
@@ -70,8 +72,7 @@ const getAllCard = async (req, res) => {
 
 const toggleLike = async (req, res) => {
     const CardId = req.params.id;
-    const userId = req.body.userId; // Lấy userId từ req.body
-
+    const userId = req.body.userId;
     // Kiểm tra xem người dùng đã like Card chưa
     const card = await Card.findById(CardId);
 

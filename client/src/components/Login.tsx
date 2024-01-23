@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import UserService from '../services/user.service';
 import { toast } from 'react-toastify';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { authGoogle, login } from '../services/user.service';
 
 const LoginComponent = () => {
     const navigate = useNavigate()
@@ -19,8 +21,8 @@ const LoginComponent = () => {
         }));
     };
 
-    const login = async () => {
-        const response = await UserService.login(formData)
+    const loginEmail = async () => {
+        const response: any = await login(formData)
         console.log(response.data);
         if (response.data.status === 'success') {
             localStorage.setItem('token', response.data.token)
@@ -32,6 +34,39 @@ const LoginComponent = () => {
             });
         }
     }
+
+    const loginGoogle = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            console.log('Login successful:', tokenResponse);
+            // Lấy thông tin người dùng bằng cách sử dụng access_token
+            try {
+                const profile = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+                    headers: {
+                        Authorization: `Bearer ${tokenResponse.access_token}`,
+                    },
+                });
+
+                console.log('User profile:', profile);
+                // Lưu thông tin người dùng vào db
+                if (profile.status === 200) {
+                    const params = {
+                        email: profile.data.email,
+                        username: profile.data.name
+                    }
+                    const response: any = await authGoogle(params)
+                    // console.log("response: ", response);
+                    if (response.data.status === 'success') {
+                        localStorage.setItem('token', response.data.token)
+                        // store.dispatch(validateAuth(response.data.token))
+                        navigate('/')
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        },
+        // Các options khác (clientId, redirectUri, ...)
+    });
     return (
         <div>
             <section className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -40,7 +75,7 @@ const LoginComponent = () => {
                         <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>
                         <p className="text-xs mt-4 text-[#002D74]">If you are already a member, easily log in</p>
 
-                        <form onSubmit={(e) => { e.preventDefault(); login(); }} className="flex flex-col gap-4">
+                        <form onSubmit={(e) => { e.preventDefault(); loginEmail(); }} className="flex flex-col gap-4">
                             <input onChange={(e) => handleChange(e)} className="p-2 mt-8 rounded-xl border" type="email" name="email" placeholder="Email" />
                             <input onChange={(e) => handleChange(e)} className="p-2 mt-8 rounded-xl border" type="password" name="password" placeholder="Password" />
                             <button type="submit" className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300">Login</button>
@@ -52,7 +87,10 @@ const LoginComponent = () => {
                             <hr className="border-gray-400" />
                         </div>
 
-                        <button className="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 text-[#002D74]">
+                        <button
+                            onClick={() => loginGoogle()}
+                            className="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 text-[#002D74]"
+                        >
                             <svg className="mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="25px">
                                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
                                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />

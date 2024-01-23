@@ -17,7 +17,7 @@ const CardItem: React.FC<Props> = ({ card }) => {
         dispatch(validateAuth(token) as any)
     }, [])
 
-    const onClickDesin = () => {
+    const onClickCard = () => {
         setShowModal(true)
     }
 
@@ -38,7 +38,7 @@ const CardItem: React.FC<Props> = ({ card }) => {
                 before:opacity-50
                 cursor-pointer
                 rounded-3xl shadow-[0_0_10px_#00000040]"
-                    onClick={() => onClickDesin()}
+                    onClick={() => onClickCard()}
                 >
                     <img
                         src={card.thumbnail}

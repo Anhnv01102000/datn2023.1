@@ -2,10 +2,10 @@ var jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 
-const CreatJWT = (payload) => {
+const CreateJWT = (payload) => {
     const key = process.env.JWT_SECRET
     let token = jwt.sign(payload, key);
-    console.log({ token })
+    // console.log({ token })
     return token
 }
 
@@ -16,7 +16,7 @@ const veryfiToken = (token) => {
             console.log({ err })
             return null
         }
-        console.log(decoded) // bar
+        // console.log(decoded) // bar
         return decoded
     });
 
@@ -25,5 +25,5 @@ const veryfiToken = (token) => {
 
 }
 module.exports = {
-    CreatJWT, veryfiToken
+    CreateJWT, veryfiToken
 };

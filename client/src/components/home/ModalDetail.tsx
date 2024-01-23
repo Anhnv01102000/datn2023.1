@@ -26,7 +26,7 @@ const ModalDetail: React.FC<Props> = ({ showModal, onCloseModal, card }) => {
     const userInfo = useSelector((state: any) => state.userReducer.userInfo);
 
     // console.log("userInfo: ", userInfo.id);
-    console.log("card: ", card);
+    // console.log("card: ", card);
 
     useEffect(() => {
         const checkLike = card.userLike.find((el: any) => el === userInfo.id);
@@ -63,7 +63,7 @@ const ModalDetail: React.FC<Props> = ({ showModal, onCloseModal, card }) => {
         const res = await dispatch(deleteCard1(card.id) as any)
         if (res.data.status === "success") {
             onCloseModal()
-            toast.error("Đã xóa thiết kế!", {
+            toast.error("Đã xóa thiệp!", {
                 position: toast.POSITION.TOP_CENTER,
             });
         }

@@ -14,7 +14,7 @@ const creatImageAsset = async (req, res) => {
             name: filename,
             image: imageUrl
         });
-        console.log("createImageAsset: ", createImageAsset)
+        // console.log("createImageAsset: ", createImageAsset)
         res.status(200).json({
             status: 'success',
             data: createImageAsset
@@ -34,7 +34,7 @@ const getAllImageAsset = async (req, res) => {
         const checkEmail = await User.find({ email });
         const getAllImagesAssets = await ImageAsset.find({ user: checkEmail[0].id });
 
-        console.log("getAllImagesAssets: ", getAllImagesAssets)
+        // console.log("getAllImagesAssets: ", getAllImagesAssets)
         res.status(200).json({
             status: 'success',
             data: getAllImagesAssets

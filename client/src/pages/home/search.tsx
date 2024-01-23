@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useOutlet } from 'react-router-dom'
+import { useLocation, useNavigate, useOutlet } from 'react-router-dom'
 import Header from '../../components/home/Header'
 import CardList from '../../components/home/Card/CardList'
 import { validateAuth } from '../../store/actions/userAction'
 import { useDispatch, useSelector } from 'react-redux'
 import { getListCard } from '../../store/actions/cardAction'
 
-const Home = () => {
+const Search = () => {
     const navigate = useNavigate()
     const outlet = useOutlet()
     const dispatch = useDispatch()
     const userInfo = useSelector((state: any) => state.userReducer.userInfo);
-    const listCard = useSelector((state: any) => state.cardReducer.cards);
 
     useEffect(() => {
         const token: any = localStorage.getItem('token')
         if (token) {
             dispatch(validateAuth(token) as any)
         }
-        fetchCard()
     }, [])
 
+    const location = useLocation();
+    const searchData = location.state?.searchData;
 
-    const fetchCard = async () => {
-        await dispatch(getListCard() as any)
-    }
+    console.log(searchData);
+
     return (
         <>
             {userInfo ? (
@@ -34,7 +33,7 @@ const Home = () => {
                             userInfo={userInfo}
                         />
                         <CardList
-                            listCard={listCard}
+                            listCard={searchData}
                         />
                     </>
                 )
@@ -46,4 +45,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default Search

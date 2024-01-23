@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import UserService from '../services/user.service';
 import { toast } from 'react-toastify';
+import { signup } from '../services/user.service';
 
 const SignUpComponent = () => {
     const navigate = useNavigate()
@@ -23,8 +23,8 @@ const SignUpComponent = () => {
 
     console.log(formData);
 
-    const signUp = async () => {
-        const response = await UserService.signup(formData);
+    const signUpEmail = async () => {
+        const response: any = await signup(formData);
         if (response.data.status === "success") {
             toast.success("Đăng ký tài khoản thành công!", {
                 position: toast.POSITION.TOP_CENTER,
@@ -42,7 +42,7 @@ const SignUpComponent = () => {
                 <div className="bg-gray-100 flex rounded-2xl border-2 shadow-2xl max-w-3xl p-5 items-center">
                     <div className="md:w-1/2 px-8 md:px-16">
                         <h2 className="font-bold text-2xl text-[#002D74]">Sign Up</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); signUp(); }} className="flex flex-col gap-4">
+                        <form onSubmit={(e) => { e.preventDefault(); signUpEmail(); }} className="flex flex-col gap-4">
                             <input onChange={(e) => handleChange(e)} className="p-2 mt-4 rounded-xl border" type="email" name="email" placeholder="Email" />
                             <input onChange={(e) => handleChange(e)} className="p-2 mt-4 rounded-xl border" type="password" name="password" placeholder="Password" />
                             <input onChange={(e) => handleChange(e)} className="p-2 mt-4 rounded-xl border" type="password" name="confirmPassword" placeholder="Confirm Password" />

@@ -26,7 +26,7 @@ const FlyoutMenu: React.FC<Props> = ({ userInfo }) => {
     ]
     const navigate = useNavigate()
 
-    const handleNavigate = (item: any) => {
+    const handleNavigate = async (item: any) => {
         if (item.name === "Logout") {
             localStorage.clear();
             navigate(item.href)

@@ -15,24 +15,29 @@ const Admin = () => {
     }, [])
 
     const userInfo = useSelector((state: any) => state.userReducer.userInfo);
-    console.log(userInfo);
+    console.log(userInfo.role);
+    // console.log("outlet: ", outlet);
 
     return (
         <>
-            {userInfo && userInfo.role === 'Admin' || userInfo.role === 'Owner' ? (
-                outlet ? outlet : (
+            {userInfo && userInfo.role === 'Admin' || userInfo.role === 'Supporter' ? (
+                outlet ? (outlet) : (
                     <>
-                        <LayoutAdmin>
-                            <AdminComponent />
-                        </LayoutAdmin>
+                        {userInfo.role === 'Admin' && (
+                            <LayoutAdmin>
+                                <AdminComponent />
+                            </LayoutAdmin>
+                        )}
+                        {userInfo.role === 'Supporter' && (
+                            <div>Bạn không có quyền truy cập vào trang này</div>
+                        )}
                     </>
                 )
             ) : (
-                // Hiển thị hoặc chuyển hướng đến trang không có quyền truy cập nếu người dùng không phải là admin
-                <div>Bạn không có quyền truy cập trang này</div>
+                <div>Bạn không có quyền truy cập vào trang này</div>
             )}
         </>
-    );
+    )
 }
 
 export default Admin

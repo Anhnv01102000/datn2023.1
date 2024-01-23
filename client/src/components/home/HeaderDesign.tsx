@@ -1,7 +1,9 @@
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react'
-import testImage from "../../assets/man.png"
+import React, { useEffect } from 'react'
+import man from "../../assets/man.png"
+import { useDispatch, useSelector } from 'react-redux';
+import { validateAuth } from '../../store/actions/userAction';
 
 interface Props {
     saveDesign: () => void;
@@ -14,6 +16,15 @@ const HeaderDesign: React.FC<Props> = ({
     previewDesign,
     onMoveHome
 }) => {
+
+    const dispatch = useDispatch()
+    const token: any = localStorage.getItem('token');
+    useEffect(() => {
+        dispatch(validateAuth(token) as any);
+    }, [])
+
+    const userInfo = useSelector((state: any) => state.userReducer.userInfo);
+
     return (
         <div className="header">
             <header className="bg-current p-1">
@@ -41,13 +52,26 @@ const HeaderDesign: React.FC<Props> = ({
                         >
                             Preview
                         </button>
-                        <img
-                            src={testImage}
-                            alt='user-image'
-                            width={60}
-                            height={60}
-                            className='hover:bg-gray-300 p-2 rounded-full cursor-pointer'
-                        />
+                        {
+                            userInfo.image
+                                ?
+                                <img
+                                    src={userInfo.image}
+                                    alt='user-image'
+                                    width={60}
+                                    height={60}
+                                    className='hover:bg-gray-300 p-2 rounded-full cursor-pointer'
+                                />
+                                :
+                                <img
+                                    src={man}
+                                    alt='user-image'
+                                    width={60}
+                                    height={60}
+                                    className='hover:bg-gray-300 p-2 rounded-full cursor-pointer'
+                                />
+                        }
+
                     </div>
                 </nav>
             </header>

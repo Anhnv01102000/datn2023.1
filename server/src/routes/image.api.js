@@ -23,7 +23,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
     })
 });
 
-// fix 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported
+// fix lỗi 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported
 router.post('/get-remote-image', (req, res) => {
     const imageUrl = req.body.url;
     request.get(imageUrl, { encoding: null }, (error, response, body) => {

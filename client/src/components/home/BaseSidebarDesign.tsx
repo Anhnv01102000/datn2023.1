@@ -47,14 +47,14 @@ const BaseSidebar: React.FC<Props> = ({
                     {/* Background */}
                     {title === 'Background' && (
                         <>
-                            {content.map((image, idx) =>
+                            {content.map((background, idx) =>
                             (
                                 <div key={idx} className="w-full mb-5 break-inside-avoid">
                                     <img
-                                        src={image.image}
+                                        src={background.image}
                                         alt={`Image ${idx}`}
                                         className='max-w-full h-auto object-cover rounded-xl border-[2px] shadow'
-                                        onClick={() => onClickImageBackground(image)}
+                                        onClick={() => onClickImageBackground(background)}
                                     />
                                 </div>
                             )

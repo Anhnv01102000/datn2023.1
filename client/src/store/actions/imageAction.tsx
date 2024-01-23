@@ -8,7 +8,7 @@ const uploadImageByS3 = (fileInput: any) => async (dispatch: AppDispatch) => {
         }
         // Access the files property from the FileList
         const file = fileInput.files && fileInput.files[0];
-        // console.log(file);
+        console.log(file);
         if (!file) {
             throw new Error('No file selected.');
         }

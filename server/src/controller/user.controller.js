@@ -1,15 +1,61 @@
 const User = require('../models/user.model');
-const { CreatJWT, veryfiToken } = require('../middleware/JWTAction');
+const { CreateJWT, veryfiToken } = require('../middleware/JWTAction');
 const bcrypt = require('bcrypt');
 
-var checkEmail = (email) => {
+const authGoogle = async (req, res) => {
+    const username = req.body.username;
+    const email = req.body.email;
+    // const password = req.body.password;
+    const findUser = await User.find({ email: email });
+    console.log(findUser);
+    if (findUser.length === 0) {
+        const createUser = await User.create({
+            username,
+            email,
+            // password: hashPassword,
+        });
+        console.log(createUser);
+        const token = CreateJWT({
+            id: createUser.id.toString(),
+            username: createUser.username,
+            // password: password,
+            email: createUser.email,
+            image: createUser.image,
+            description: createUser.description,
+            role: createUser.role
+        });
+        return res.status(200).json({
+            status: 'success',
+            token: token,
+            data: createUser,
+        });
+    }
+    else {
+        const token = CreateJWT({
+            id: findUser[0].id.toString(),
+            username: findUser[0].username,
+            email: findUser[0].email,
+            image: findUser[0].image,
+            description: findUser[0].description,
+            role: findUser[0].role
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            token: token,
+            data: findUser[0],
+        });
+    }
+}
+
+const checkEmail = (email) => {
     const emailRegexp =
-        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
     return emailRegexp.test(email);
 };
 
-var checkUserPassword = (password) => {
-    var regex = /^[A-Za-z\d]{6,10}$/;
+const checkUserPassword = (password) => {
+    const regex = /^[A-Za-z\d]{6,}$/;
     return regex.test(password);
 };
 
@@ -20,7 +66,7 @@ const validateSignUp = (data) => {
     } else if (!checkEmail(data.email)) {
         return 'Email không đúng định dạng';
     } else if (!checkUserPassword(data.password)) {
-        return 'mật khẩu phải có trên 6 ký tự';
+        return 'Mật khẩu có chứa kí tự không hợp lệ hoặc chưa đủ 6 kí tự';
     } else if (data.password != data.confirmPassword) {
         return 'comfirmPassword voi password không trùng khớp';
     }
@@ -40,15 +86,9 @@ const handleSignup = async (req, res) => {
     const findUser = await User.find({ email: email });
 
     if (findUser.length === 0) {
-        const token = CreatJWT({
-            username: username,
-            password: password,
-            email: email,
-        });
         //mã howas password
         const hashPassword = await bcrypt.hash(password, 12);
         // console.log('mã hóa', hashPassword);
-
         const createUser = await User.create({
             username,
             email,
@@ -56,7 +96,6 @@ const handleSignup = async (req, res) => {
         });
         return res.status(200).json({
             status: 'success',
-            token: token,
             data: createUser,
         });
     } else {
@@ -82,7 +121,7 @@ const handleLogin = async (req, res) => {
     const hashPassword = checkLogin[0].password;
     const comparePass = await bcrypt.compare(password, hashPassword);
     if (comparePass) {
-        const token = CreatJWT({
+        const token = CreateJWT({
             id: checkLogin[0]._id.toString(),
             username: checkLogin[0].username,
             password: password,
@@ -152,6 +191,49 @@ const updateUserRole = async (req, res) => {
     });
 };
 
+const updateUserProfile = async (req, res) => {
+    const userId = req.params.id
+    const username = req.body.username
+    const password = req.body.password
+    const image = req.body.image
+    const description = req.body.description
+
+    const hashPassword = await bcrypt.hash(password, 12);
+
+    const updatedUser = await User.findByIdAndUpdate(userId, {
+        username: username,
+        password: hashPassword,
+        image: image,
+        description: description,
+    }, { new: true });
+
+    // Kiểm tra nếu người dùng không tồn tại
+    if (!updatedUser) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'User not found',
+        });
+    }
+
+    const token = CreateJWT({
+        id: updatedUser._id.toString(),
+        username: updatedUser.username,
+        password: password,
+        email: updatedUser.email,
+        image: updatedUser.image,
+        description: updatedUser.description,
+        role: updatedUser.role
+    });
+
+
+    // Trả về thông tin người dùng đã chỉnh sửa
+    res.status(200).json({
+        status: 'success',
+        token: token,
+        data: updatedUser,
+    });
+}
+
 const deleteUser = async (req, res) => {
     const userId = req.params.id;
 
@@ -174,5 +256,7 @@ module.exports = {
     handleValidateToken,
     getAllUsers,
     updateUserRole,
-    deleteUser
+    updateUserProfile,
+    deleteUser,
+    authGoogle
 };

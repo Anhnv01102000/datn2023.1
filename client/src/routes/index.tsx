@@ -12,6 +12,7 @@ import ManageBackground from '../pages/admin/manageBackground';
 import ManageCard from '../pages/admin/manageCard';
 import Success from '../pages/home/success';
 import ChangeProfile from '../pages/home/changeProfile';
+import Search from '../pages/home/search';
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
             {
                 path: '/design/:id?',
                 element: <Design />,
+            },
+            {
+                path: '/search',
+                element: <Search />,
             },
             {
                 path: '/success',
