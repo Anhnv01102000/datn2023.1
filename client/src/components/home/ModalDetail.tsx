@@ -52,7 +52,7 @@ const ModalDetail: React.FC<Props> = ({ showModal, onCloseModal, card }) => {
         } else {
             setLike(false)
         }
-        dispatch(getListCard() as any)
+        await dispatch(getLikeCardByUser(userInfo.id) as any);
     }
 
     const onClickEditCard = () => {
@@ -138,13 +138,6 @@ const ModalDetail: React.FC<Props> = ({ showModal, onCloseModal, card }) => {
                                                             </button>
                                                         </div>
                                                         :
-                                                        // <button
-                                                        //     type="button"
-                                                        //     className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-slate-700 text-base font-medium text-white hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 sm:text-sm"
-                                                        // // onClick={YOUR_BUY_BUTTON_HANDLER}
-                                                        // >
-                                                        //     Mua Ngay
-                                                        // </button>
                                                         <PayPal
                                                             card={card}
                                                             userInfo={userInfo}
@@ -173,7 +166,6 @@ const ModalDetail: React.FC<Props> = ({ showModal, onCloseModal, card }) => {
                 </Dialog>
             </Transition.Root>
         </>
-
     )
 }
 

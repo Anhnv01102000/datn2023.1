@@ -18,11 +18,14 @@ const getBackground = async (req, res) => {
 
 const updateBackground = async (req, res) => {
     const backgroundId = req.params.id
+    console.log(backgroundId);
+    const name = req.body.name
+    console.log(name);
 
     const updatedBackground = await Background.findByIdAndUpdate(
         backgroundId,
-        req.body,
-        { new: true, runValidators: true }
+        { name: name },
+        { new: true }
     );
 
     if (!updatedBackground) {

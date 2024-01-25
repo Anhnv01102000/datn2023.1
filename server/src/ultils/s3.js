@@ -16,7 +16,7 @@ const s3 = new S3({
 // uploads a file to s3
 function uploadFile(file) {
     console.log("file reques:", file)
-    // console.log("file path: ",file.path)
+    // Tạo một ReadStream từ đường dẫn của file tạm thời đã được multer lưu trữ
     const fileStream = fs.createReadStream(file.path)
 
     const uploadParams = {

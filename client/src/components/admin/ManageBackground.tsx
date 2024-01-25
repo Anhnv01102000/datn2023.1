@@ -17,12 +17,11 @@ const ManageBackgroundComponent = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
+        const fetchBackgrounds = async () => {
+            await dispatch(getListBackground() as any)
+        }
         fetchBackgrounds()
     }, [])
-
-    const fetchBackgrounds = async () => {
-        dispatch(getListBackground() as any)
-    }
 
     const backgrounds = useSelector((state: any) => state.backgroundReducer.backgrounds)
     console.log(backgrounds);
@@ -80,14 +79,12 @@ const ManageBackgroundComponent = () => {
 
     const normFile = (e: any) => {
         console.log('event: ', e.fileList);
-        if (Array.isArray(e)) {
-            return e;
-        }
         // console.log(e?.file?.response);
         if (e?.file?.response?.status === "success") {
             return e?.file?.response?.data?.Location
         }
     };
+
     const [form] = Form.useForm();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,7 +114,7 @@ const ManageBackgroundComponent = () => {
 
 
     const onFinish = async (values: any) => {
-        // console.log(values);
+        console.log(values);
         const image = await values?.image;
 
         const params = {
@@ -197,7 +194,7 @@ const ManageBackgroundComponent = () => {
                             !(status === STATUS.CREATE) && (
                                 <Form.Item
                                     label="ID"
-                                    name="_id"
+                                    name="id"
                                     rules={[{ required: true, message: 'Please input your account ID!' }]}
                                 >
                                     <Input disabled={true} />
@@ -218,7 +215,6 @@ const ManageBackgroundComponent = () => {
                                     action="http://localhost:8888/api/image/upload"
                                     name='file'
                                     listType="picture-card"
-
                                 >
                                     <div>
                                         <PlusOutlined />
@@ -240,7 +236,7 @@ const ManageBackgroundComponent = () => {
                     </Form>
                 </Modal >
                 <Table
-                    rowKey={"_id"}
+                    rowKey={"id"}
                     columns={columns}
                     dataSource={filterData()}
                     bordered

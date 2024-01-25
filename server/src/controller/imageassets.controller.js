@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
 const ImageAsset = require('../models/imageassets.model');
 
-const creatImageAsset = async (req, res) => {
+const createImageAsset = async (req, res) => {
     const email = req.body.email
     const imageUrl = req.body.imageUrl
     const filename = req.body.filename
@@ -29,7 +29,7 @@ const creatImageAsset = async (req, res) => {
 
 const getAllImageAsset = async (req, res) => {
     const email = req.query.email
-    console.log("email: ", email)
+    // console.log("email: ", email)
     try {
         const checkEmail = await User.find({ email });
         const getAllImagesAssets = await ImageAsset.find({ user: checkEmail[0].id });
@@ -46,6 +46,6 @@ const getAllImageAsset = async (req, res) => {
 }
 
 module.exports = {
-    creatImageAsset,
+    createImageAsset,
     getAllImageAsset
 };

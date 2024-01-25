@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { validateAuth } from '../../store/actions/userAction';
 
 interface Props {
-    saveDesign: () => void;
+    openModalSave: () => void;
     previewDesign: () => void;
     onMoveHome: () => void
 }
 
 const HeaderDesign: React.FC<Props> = ({
-    saveDesign,
+    openModalSave,
     previewDesign,
     onMoveHome
 }) => {
@@ -41,7 +41,7 @@ const HeaderDesign: React.FC<Props> = ({
                     </div> */}
                     <div className="flex h-full gap-4 items-center">
                         <button
-                            onClick={() => saveDesign()}
+                            onClick={() => openModalSave()}
                             className="text-white cursor-pointe p-1 px-4 rounded-lg border-[1px] hover:bg-white hover:text-black"
                         >
                             Save

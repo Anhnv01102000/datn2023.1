@@ -17,9 +17,7 @@ const CardList: React.FC<Props> = ({ listCard }) => {
                     />
                 ))}
             </div>
-            {/* <Pagination />   */}
         </>
-
     )
 }
 

@@ -24,9 +24,12 @@ const ChangeProfileComponent = () => {
     const [image, setImage] = useState(userInfo.image || '');
 
     const uploadImage = async (e: any) => {
+        const fileInput = e.target
         console.log(e.target);
-        const upload: any = await dispatch(uploadImageByS3(e.target) as any)
-        setImage(upload.data.data.Location)
+        if (fileInput) {
+            const upload = await dispatch(uploadImageByS3(fileInput) as any)
+            setImage(upload.data.data.Location)
+        }
     }
 
     const updateProfile = async () => {

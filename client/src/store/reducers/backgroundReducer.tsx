@@ -1,9 +1,10 @@
 const backgroundReducer = (
     state = { backgrounds: [] },
-    action: any) => {
+    action: any
+) => {
     switch (action.type) {
         case 'GET_BACKGROUND': {
-            return { ...state, loading: false, backgrounds: action.payload }
+            return { ...state, backgrounds: action.payload }
         }
         case 'CREATE_BACKGROUND': {
             let listBackground: any = state.backgrounds;

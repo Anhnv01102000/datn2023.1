@@ -8,6 +8,8 @@ import { imageReducer } from './reducers/imageReducer';
 import { cardReducer } from './reducers/cardReducer';
 import { transactionReducer } from './reducers/transactionReducer';
 import { backgroundReducer } from './reducers/backgroundReducer'
+import { imageAssetReducer } from './reducers/imageAssetReducer'
+
 
 const store = configureStore({
     reducer: combineReducers({
@@ -15,7 +17,8 @@ const store = configureStore({
         imageReducer,
         cardReducer,
         transactionReducer,
-        backgroundReducer
+        backgroundReducer,
+        imageAssetReducer
     }),
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger, thunk),
     devTools: true,

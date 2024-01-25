@@ -14,7 +14,6 @@ const PayPal: React.FC<Props> = ({ card, userInfo }) => {
     // console.log(card);
     // console.log(userInfo);
     const navigate = useNavigate()
-    const [paidFor, setPaidFor] = useState(false)
     const [error, setError] = useState("")
 
     const handleApprove = async (order: any) => {
@@ -49,17 +48,7 @@ const PayPal: React.FC<Props> = ({ card, userInfo }) => {
                 }
             }
         }
-
-        setPaidFor(true)
     }
-
-    useEffect(() => {
-        if (paidFor) {
-            toast.success("You have successfully purchased!", {
-                position: toast.POSITION.TOP_CENTER,
-            });
-        }
-    }, [paidFor]);
 
     if (error) {
         toast.error("Order was not successful, please try again!", {
@@ -91,10 +80,6 @@ const PayPal: React.FC<Props> = ({ card, userInfo }) => {
             onApprove={async (data, actions) => {
                 const order = await actions.order?.capture()
                 handleApprove(order)
-            }}
-
-            onCancel={() => {
-
             }}
 
             onError={(err: any) => {

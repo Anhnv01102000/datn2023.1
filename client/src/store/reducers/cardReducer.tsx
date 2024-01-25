@@ -1,6 +1,7 @@
 const cardReducer = (
-    state = { cardEdit: "", cardInfo: "", cards: [] },
-    action: any) => {
+    state = { cardEdit: "", cardInfo: "", cards: [], cardByUser: [], cardLikeByUser: [] },
+    action: any
+) => {
     switch (action.type) {
         case "SET_EDIT_CARD":
             return { ...state, cardEdit: action.payload };
@@ -26,7 +27,14 @@ const cardReducer = (
         }
         case "EDIT_CARD": {
             let listCard = state.cards;
-            const newList: any = listCard.map((el: any) => {
+            let listCardByUser = state.cardByUser
+            const newList = listCard.map((el: any) => {
+                if ((el.id === action.payload.id)) {
+                    return action.payload
+                }
+                return el
+            })
+            const newListCardByUser = listCardByUser.map((el: any) => {
                 if ((el.id === action.payload.id)) {
                     return action.payload
                 }
@@ -34,22 +42,26 @@ const cardReducer = (
             })
             return {
                 ...state,
-                cards: newList
+                cards: newList,
+                cardByUser: newListCardByUser
             }
         }
         case "DELETE_CARD": {
             let listCard = state.cards;
+            let listCardByUser = state.cardByUser
             const newList = listCard.filter((el: any) => (el.id !== action.payload.id))
+            const newListCardByUser = listCardByUser.filter((el: any) => (el.id !== action.payload.id))
             return {
                 ...state,
-                cards: newList
+                cards: newList,
+                cardByUser: newListCardByUser
             }
         }
         case 'GET_CARD_BY_USER': {
-            return { ...state, cards: action.payload }
+            return { ...state, cardByUser: action.payload }
         }
-        case 'GET_LIKE_CARD_BY_USER': {
-            return { ...state, cards: action.payload }
+        case 'GET_CARD_LIKE_BY_USER': {
+            return { ...state, cardLikeByUser: action.payload }
         }
         default:
             return state;

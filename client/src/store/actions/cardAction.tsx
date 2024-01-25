@@ -90,7 +90,7 @@ const getLikeCardByUser = (id: string) => async (dispatch: AppDispatch) => {
     const response = await getLikedCardByUser(id)
     if (response.data.status === "success") {
         dispatch({
-            type: 'GET_LIKE_CARD_BY_USER',
+            type: 'GET_CARD_LIKE_BY_USER',
             payload: response.data.data
         })
     }

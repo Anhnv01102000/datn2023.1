@@ -1,4 +1,3 @@
-import axios from "axios";
 import { AppDispatch } from ".."
 import { createNewBackground, deleteBackground, getBackground, updateBackground } from "../../services/background.service";
 
@@ -30,7 +29,7 @@ const editBackground = (id: string, data: any) => async (dispatch: AppDispatch) 
     if (response.data.status === "success") {
         dispatch({
             type: "EDIT_BACKGROUND",
-            pauload: response.data.data || []
+            payload: response.data.data || []
         })
     }
 }

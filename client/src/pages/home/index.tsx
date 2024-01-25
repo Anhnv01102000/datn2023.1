@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate, useOutlet } from 'react-router-dom'
 import Header from '../../components/home/Header'
 import CardList from '../../components/home/Card/CardList'

@@ -133,16 +133,14 @@ const getLikedCards = async (req, res) => {
 
 const changeOwner = async (req, res) => {
     const cardId = req.params.id;
-    const newOwnerId = req.body.newOwnerId; // Assuming you provide the new owner ID in the request body
+    const newOwnerId = req.body.newOwnerId;
 
-    // Find the card by ID
     const card = await Card.findById(cardId);
 
     if (!card) {
         return res.status(404).json({ message: 'Không tìm thấy thiệp' });
     }
 
-    // Find the new owner by ID
     const newOwner = await User.findById(newOwnerId);
 
     if (!newOwner) {

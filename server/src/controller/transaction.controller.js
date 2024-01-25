@@ -32,21 +32,7 @@ const getAllTransaction = async (req, res) => {
     });
 }
 
-const getTransactionsBySeller = (req, res) => {
-    const sellerId = req.params.sellerId;
-    console.log(sellerId);
-    const transactions = Transaction.find({ seller: sellerId })
-        .populate('cardId')
-        .populate('payer')
-        .exec();
-    res.status(200).json({
-        status: 'success',
-        data: transactions,
-    });
-}
-
 module.exports = {
     createTransaction,
     getAllTransaction,
-    getTransactionsBySeller
 }

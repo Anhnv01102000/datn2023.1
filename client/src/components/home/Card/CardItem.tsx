@@ -4,7 +4,6 @@ import { validateAuth } from '../../../store/actions/userAction';
 import { useDispatch } from 'react-redux';
 import ModalDetail from '../ModalDetail';
 
-
 interface Props {
     card: any
 }

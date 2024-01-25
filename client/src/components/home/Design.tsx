@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, RefObject, MutableRefObject } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import BaseSidebar from './BaseSidebarDesign';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -18,10 +18,11 @@ import brushStroke4 from "../../assets/brushStroke4.svg"
 import { validateAuth } from '../../store/actions/userAction';
 import ModalPreview from './ModalPreview';
 import { getRemoteImage } from '../../services/image.service';
-import { createCard, cardEditById, cardInfoById, editCard, getListCard, resetCardEdit, resetCardInfo } from '../../store/actions/cardAction';
-import { ToastContainer, toast } from "react-toastify";
+import { cardEditById, cardInfoById, createCard, editCard, getListCard, resetCardEdit, resetCardInfo } from '../../store/actions/cardAction';
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getListBackground } from '../../store/actions/backgroundAction';
+import { createNewImageAsset, getListImageAsset } from '../../store/actions/imageAssetAction';
 
 interface Option {
     icon: IconProp;
@@ -38,13 +39,13 @@ const Card: React.FC = () => {
     const cardEdit = useSelector((state: any) => state.cardReducer.cardEdit);
     const cardInfo = useSelector((state: any) => state.cardReducer.cardInfo);
     const backgrounds = useSelector((state: any) => state.backgroundReducer.backgrounds)
+    const imageAssets = useSelector((state: any) => state.imageAssetReducer.imageAssets)
+
     const email = userInfo.email
 
     // console.log("cardInfo: ", cardInfo);
     const canvasRef: any = useRef(null);
     const [dispatchCompleted, setDispatchCompleted] = useState(false);
-
-    const fileImageAsset = useRef<HTMLInputElement>(null);
 
     const [strokeDrawing, setStrokeDrawing] = useState([
         { stroke: '20', image: brushStroke1, active: false },
@@ -65,13 +66,10 @@ const Card: React.FC = () => {
     const [isImage, setIsImage] = useState<boolean>(true);
     const [isBoldText, setIsBoldText] = useState(false);
     const [isItalicText, setIsItalicText] = useState(false);
-    const [isAlignLeft, setIsAlignLeft] = useState(true);
-    const [isAlignRight, setIsAlignRight] = useState(false);
-    const [isAlignCenter, setIsAlignCenter] = useState(false);
-    const [isAlignJustify, setIsAlignJustify] = useState(false);
+
     const [textCard, setTextCard] = useState({
-        textColor: 'black',
-        bgColor: '',
+        textColor: '#000000',
+        bgColor: '#ffffff',
         fontFamily: 'Roboto',
         fontSize: '40',
         textAlign: '',
@@ -96,6 +94,9 @@ const Card: React.FC = () => {
             if (cardId) {
                 await dispatch(cardEditById(cardId) as any);
                 await dispatch(cardInfoById(cardId) as any);
+            }
+            if (email) {
+                await dispatch(getListImageAsset({ email: email }) as any)
             }
             await dispatch(getListBackground() as any)
             setDispatchCompleted(true);
@@ -140,6 +141,10 @@ const Card: React.FC = () => {
         }
     }, [textCard, isCanvasInitialized]);
 
+    useEffect(() => {
+        setContentOption(imageAssets)
+    }, [imageAssets]);
+
     const initCanvas = () => {
         console.log("cardEdit: ", cardEdit);
         const canvas = new fabric.Canvas(canvasRef.current, {
@@ -160,9 +165,9 @@ const Card: React.FC = () => {
         return canvas;
     };
 
-    const onMoveOption = async (idx: number, name: string, canvas: any) => {
+    const onMoveOption = async (id: number, name: string) => {
         const updatedOptionCard = optionCard.map((el, i) => {
-            return { ...el, active: i === idx };
+            return { ...el, active: i === id ? true : false };
         });
         setOptionCard(updatedOptionCard);
         setTitleOption(name);
@@ -174,11 +179,9 @@ const Card: React.FC = () => {
         } else if (name === 'Ảnh của tôi') {
             setIsBoxEditText(false)
             setIsImage(true);
-            const imageAsset = await getAllImageAsset({
-                email: email,
-            });
-            console.log(imageAsset.data.data);
-            setContentOption(imageAsset.data.data);
+            // const imageAsset = await getAllImageAsset({ email: email });
+            // console.log(imageAsset.data.data);
+            setContentOption(imageAssets);
         } else if (name === 'Thêm chữ') {
             setIsImage(false);
             setContentOption([])
@@ -193,34 +196,38 @@ const Card: React.FC = () => {
         }
     };
 
-    const uploadImageAsset = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const file = fileImageAsset.current;
-        console.log(file);
-
-        if (file) {
+    const uploadImageAsset = async (e: any) => {
+        const fileInput = e.target
+        // console.log(fileInput);
+        if (fileInput) {
             try {
-                const upload = await dispatch(uploadImageByS3(file) as any)
+                const upload = await dispatch(uploadImageByS3(fileInput) as any)
                 console.log('upload is: ', upload);
                 const imageUrl = upload.data.data.Location;
 
-                console.log(imageUrl);
+                // console.log(imageUrl);
 
-                await createImageAsset({
+                const data = {
                     email: email,
                     imageUrl: imageUrl,
                     filename: userInfo.username,
-                });
+                }
 
-                console.log(email);
-                const imageAsset = await getAllImageAsset({ email: email, });
+                // await createImageAsset({
+                //     email: email,
+                //     imageUrl: imageUrl,
+                //     filename: userInfo.username,
+                // });
 
-                console.log("imageasset: ", imageAsset)
+                // console.log(email);
+                // const imageAsset = await getAllImageAsset({ email: email });
+                // console.log("imageasset: ", imageAsset)
+                // setTimeout(() => {
+                //     setContentOption(imageAsset.data.data);
+                //     console.log('update image success');
+                // }, 1000);
 
-                setTimeout(() => {
-                    setContentOption(imageAsset.data.data);
-                    console.log('update image success');
-                }, 1000);
+                await dispatch(createNewImageAsset(data) as any)
             } catch (error) {
                 console.error('Error: ', error);
             }
@@ -234,7 +241,7 @@ const Card: React.FC = () => {
             opacity: 1,
             shadow: undefined,
             visible: true,
-            backgroundColor: '',
+            backgroundColor: '#ffffff',
             fillRule: 'nonzero',
             paintFirst: 'fill',
             fill: 'black',
@@ -248,7 +255,6 @@ const Card: React.FC = () => {
             textBackgroundColor: '',
             charSpacing: 0,
             width: 300,
-            // splitByGrapheme: true,
             styles: {},
             selectable: true
         });
@@ -280,40 +286,26 @@ const Card: React.FC = () => {
                 }));
                 break;
             case 'align-left':
-                setIsAlignLeft(true);
-                setIsAlignCenter(false);
-                setIsAlignRight(false);
-                setIsAlignJustify(false);
                 setTextCard((prevTextCard) => ({
                     ...prevTextCard,
                     textAlign: 'left',
                 }));
                 break;
             case 'align-right':
-                setIsAlignLeft(false);
-                setIsAlignCenter(false);
-                setIsAlignRight(true);
-                setIsAlignJustify(false);
                 setTextCard((prevTextCard) => ({
                     ...prevTextCard,
                     textAlign: 'right',
                 }));
                 break;
             case 'align-center':
-                setIsAlignLeft(false);
-                setIsAlignCenter(true);
-                setIsAlignRight(false);
-                setIsAlignJustify(false);
+
                 setTextCard((prevTextCard) => ({
                     ...prevTextCard,
                     textAlign: 'center',
                 }));
                 break;
             case 'align-justify':
-                setIsAlignLeft(false);
-                setIsAlignCenter(false);
-                setIsAlignRight(false);
-                setIsAlignJustify(true);
+
                 setTextCard((prevTextCard) => ({
                     ...prevTextCard,
                     textAlign: 'justify',
@@ -561,15 +553,19 @@ const Card: React.FC = () => {
         <div className="card">
             {/* Header */}
             <HeaderDesign
-                saveDesign={openModalSave}
+                openModalSave={openModalSave}
                 previewDesign={openModalPreview}
                 onMoveHome={handleBack}
             />
             <div className="swap flex w-[100%] h-[90vh]">
                 {/* Sidebar */}
                 <div className="swap-sidebar w-fit min-w-[8%] border-slate-200 border">
-                    {optionCard.map((option, idx) => (
-                        <div key={idx} className={`swap-sidebar__option p-2 py-6 cursor-pointer grid place-items-center ${option.active ? 'border-r-2 border-sky-500' : ''}`} onClick={() => onMoveOption(idx, option.name, canvasRef.current)}>
+                    {optionCard.map((option, id) => (
+                        <div
+                            key={id}
+                            className={`swap-sidebar__option p-2 py-6 cursor-pointer grid place-items-center ${option.active ? 'border-r-2 border-sky-500' : ''}`}
+                            onClick={() => onMoveOption(id, option.name)}
+                        >
                             <FontAwesomeIcon icon={option.icon} className='text-xl' />
                             <div className={`text-sm p-1 ${option.active ? 'text-sky-500' : ''}`}>{option.name}</div>
                         </div>
@@ -590,7 +586,7 @@ const Card: React.FC = () => {
                         <label className="w-32 h-[100px] swap-sidebar__option p-4 cursor-pointer grid place-items-center border-dashed border-2 border-indigo-600 rounded-md">
                             <FontAwesomeIcon icon={faUpload} />
                             <div className="text-sm p-1">Upload</div>
-                            <input style={{ display: 'none' }} placeholder="Chọn tệp" type="file" ref={fileImageAsset} accept=".png" onChange={uploadImageAsset} multiple />
+                            <input style={{ display: 'none' }} placeholder="Chọn tệp" type="file" accept=".png" onChange={(e) => uploadImageAsset(e)} multiple />
                         </label>
                     </div>
                 </BaseSidebar>

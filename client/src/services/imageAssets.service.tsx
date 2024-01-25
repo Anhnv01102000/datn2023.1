@@ -14,7 +14,6 @@ const createImageAsset = (params: Params) => {
 
 const getAllImageAsset = (params: any) => {
     console.log(params);
-
     return axios.get(`imageassets/all/?email=${params.email}`, params)
 }
 

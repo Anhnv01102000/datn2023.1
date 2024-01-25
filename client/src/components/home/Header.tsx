@@ -5,6 +5,7 @@ import logo from "../../assets/logo.png"
 import { useDispatch, useSelector } from 'react-redux';
 import { getListCard } from '../../store/actions/cardAction';
 import { useEffect, useState } from 'react';
+import { getAllCard } from '../../services/card.service';
 
 interface Props {
     userInfo: { id: string, username: string, email: string, image: string, role: String }
@@ -19,7 +20,6 @@ const Header: React.FC<Props> = ({ userInfo }) => {
     }
 
     const listCard = useSelector((state: any) => state.cardReducer.cards);
-
     const fetchCard = async () => {
         await dispatch(getListCard() as any)
     }
@@ -30,10 +30,17 @@ const Header: React.FC<Props> = ({ userInfo }) => {
 
     // Search
     const [input, setInput] = useState('')
+
     const search = () => {
         const searchData = listCard.filter((el: any) => el.name.toLowerCase().includes(input.toLowerCase()))
         navigate('/search', { state: { searchData } });  // Truyền searchData sang state của page search
         setInput("")
+    }
+
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            search();
+        }
     }
     return (
         <div className='flex justify-between gap-3 md:gap-2 items-center p-6 '>
@@ -77,11 +84,7 @@ const Header: React.FC<Props> = ({ userInfo }) => {
                     className='bg-transparent w-full focus:outline-none'
                     onChange={(e) => setInput(e.target.value)}
                     value={input}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            search();
-                        }
-                    }}
+                    onKeyDown={(e) => handleKeyDown(e)}
                 />
             </div>
             <HiBell className='text-[25px] md:text-[50px] text-gray-500 cursor-pointer' />
